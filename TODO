@@ -1,0 +1,5 @@
+- Save the current time
+- Start at the saved current time when playing a file
+- Show currently downloading items
+- Do not download item if its data are already stored
+- Provide a way to force a re-download of an item -> maybe save the store date
