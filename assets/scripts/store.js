@@ -93,10 +93,10 @@
             });
         }
 
-        add(record) {
+        save(record) {
             const transaction = this.dbHandler.transaction([this.objectStoreDefinition.getName()], TRANSACTION_TYPE_READWRITE);
             const objectStore = transaction.objectStore(this.objectStoreDefinition.getName());
-            const addRequest = objectStore.add(record);
+            const addRequest = objectStore.put(record);
 
             return new Promise((resolve, reject) => {
                 addRequest.onerror = function (event) {
