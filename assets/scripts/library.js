@@ -27,6 +27,7 @@
         },
     ];
 
+    const playerElt = document.getElementById('player');
     const playlistElt = document.getElementById('playlist');
     const playlistItemTpl = document.getElementById('playlist-item');
     const createPlaylistItemDocument = document.importNode.bind(document, playlistItemTpl.content, true);
@@ -78,6 +79,22 @@
     }
 
     function handlePlaylistItemClick(playlistItemElt) {
-        console.log('handlePlaylistItemClick:', playlistItemElt);
+        const id = playlistItemElt.dataset.playlistItemId;
+        const playlistItem = playlist.find((playlistItem) => playlistItem.id === id);
+
+        if (playlistItem.objectUrl) {
+            play(playlistItem);
+            return;
+        }
+
+        playlistStore.fetch(playlistItem.id).then((record) => {
+            playlistItem.objectUrl = window.URL.createObjectURL(record.blob);
+            play(playlistItem);
+        });
+    }
+
+    function play(playlistItem) {
+        playerElt.src = playlistItem.url;
+        playerElt.play();
     }
 }());
