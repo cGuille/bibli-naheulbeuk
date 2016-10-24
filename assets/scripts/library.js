@@ -30,6 +30,7 @@
     const playerElt = document.getElementById('player');
     const playlistElt = document.getElementById('playlist');
     const playlistItemTpl = document.getElementById('playlist-item');
+    const playlistItemElts = [];
     const createPlaylistItemDocument = document.importNode.bind(document, playlistItemTpl.content, true);
 
     playlistStore.open().then(run);
@@ -56,6 +57,7 @@
             handlePlaylistItemClick(event.currentTarget);
         }, false);
 
+        playlistItemElts.push(playlistItemElt);
         playlistElt.appendChild(playlistItemDocument);
     }
 
@@ -79,22 +81,43 @@
     }
 
     function handlePlaylistItemClick(playlistItemElt) {
+        if (playlistItemElt.classList.contains('playing')) {
+            playlistItemElt.classList.remove('playing');
+            playlistItemElt.classList.add('paused');
+            playerElt.pause();
+            return;
+        }
+
+        if (playlistItemElt.classList.contains('paused')) {
+            playlistItemElt.classList.remove('paused');
+            playlistItemElt.classList.add('playing');
+            playerElt.play();
+            return;
+        }
+
         const id = playlistItemElt.dataset.playlistItemId;
         const playlistItem = playlist.find((playlistItem) => playlistItem.id === id);
 
         if (playlistItem.objectUrl) {
-            play(playlistItem);
+            play(playlistItemElt, playlistItem);
             return;
         }
 
         playlistStore.fetch(playlistItem.id).then((record) => {
             playlistItem.objectUrl = window.URL.createObjectURL(record.blob);
-            play(playlistItem);
+            play(playlistItemElt, playlistItem);
         });
     }
 
-    function play(playlistItem) {
-        playerElt.src = playlistItem.url;
+    function play(playlistItemElt, playlistItem) {
+        playlistItemElts.forEach((playlistItemElt) => {
+            playlistItemElt.classList.remove('playing');
+            playlistItemElt.classList.remove('paused');
+        });
+
+        playlistItemElt.classList.add('playing')
+
+        playerElt.src = playlistItem.objectUrl;
         playerElt.play();
     }
 }());

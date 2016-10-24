@@ -197,6 +197,33 @@ a:hover {
   /*color: #3a9bdc;*/
 }
 
+#playlist {
+  list-style-type: none;
+}
+
+.playlist-item {
+  padding-left: 20px;
+}
+.playlist-item > *::before {
+  content: "▶ ";
+  color: rgba(0, 0, 0, 0);
+}
+.playlist-item.paused > *::before {
+  content: "⏸ ";
+  color: #455A64;
+}
+.playlist-item.playing > *::before {
+  color: #455A64;
+}
+
+.playlist-item:hover {
+  background: linear-gradient(135deg, white, #CFD8DC);
+}
+
+.playlist-item:hover > *::before {
+  color: #607D8B;
+}
+
 footer {
   margin: 0 1em;
   padding-top: 0.3em;
