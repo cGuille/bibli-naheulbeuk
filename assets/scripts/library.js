@@ -27,19 +27,64 @@
         },
     ];
 
+    let playingItem = null;
     const playerElt = document.getElementById('player');
     const playlistElt = document.getElementById('playlist');
     const playlistItemTpl = document.getElementById('playlist-item');
     const playlistItemElts = [];
     const createPlaylistItemDocument = document.importNode.bind(document, playlistItemTpl.content, true);
 
+    playerElt.addEventListener('timeupdate', (event) => {
+        if (!playingItem) {
+            return;
+        }
+
+        playingItem.currentTime = playerElt.currentTime;
+
+        playlistStore.fetch(playingItem.id).then((record) => {
+            record.currentTime = playingItem.currentTime;
+            playlistStore.save(record);
+        });
+    }, false);
+
     playlistStore.open().then(run);
 
     function run() {
-        playlist.forEach((playlistItem) => {
-            downloadPlaylistItem(playlistItem).then((blob) => {
-                playlistStore.save({ id: playlistItem.id, blob: blob }).then(() => {
-                    displayPlaylistItem(playlistItem)
+        const playlistItemsToDownload = [];
+
+        Promise.all(playlist.map((playlistItem) => {
+            return playlistStore.fetch(playlistItem.id).then((record) => {
+                if (!record) {
+                    playlistItemsToDownload.push(playlistItem);
+                    return;
+                }
+
+                displayPlaylistItem(playlistItem);
+            });
+        })).then(() => {
+            if (!playlistItemsToDownload.length) {
+                return;
+            }
+
+            if (!confirm(
+                "Souhaitez-vous lancer le téléchargement des fichiers suivants ?\n" +
+                playlistItemsToDownload.map((playlistItem) => "\t- " + playlistItem.label).join('\n') +
+                "\nIl est déconseillé de lancer ce téléchargement depuis une connexion mobile."
+            )) {
+                return;
+            }
+
+            playlistItemsToDownload.forEach((playlistItem) => {
+                downloadPlaylistItem(playlistItem).then((blob) => {
+                    const record = {
+                        id: playlistItem.id,
+                        blob: blob,
+                        currentTime: 0,
+                    };
+
+                    playlistStore.save(record).then(() => {
+                        displayPlaylistItem(playlistItem);
+                    });
                 });
             });
         });
@@ -98,13 +143,14 @@
         const id = playlistItemElt.dataset.playlistItemId;
         const playlistItem = playlist.find((playlistItem) => playlistItem.id === id);
 
-        if (playlistItem.objectUrl) {
+        if (playlistItem.objectUrl && typeof(playlistItem.currentTime) === 'number') {
             play(playlistItemElt, playlistItem);
             return;
         }
 
         playlistStore.fetch(playlistItem.id).then((record) => {
             playlistItem.objectUrl = window.URL.createObjectURL(record.blob);
+            playlistItem.currentTime = record.currentTime;
             play(playlistItemElt, playlistItem);
         });
     }
@@ -118,6 +164,8 @@
         playlistItemElt.classList.add('playing')
 
         playerElt.src = playlistItem.objectUrl;
+        playerElt.currentTime = playlistItem.currentTime;
         playerElt.play();
+        playingItem = playlistItem;
     }
 }());
