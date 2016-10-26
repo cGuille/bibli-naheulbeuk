@@ -1,6 +1,12 @@
 bbnh-playlist-item {
     transition: background-color 150ms ease-in-out;
 }
+bbnh-playlist-item:not([downloaded]):hover {
+    background-color: darkgreen;
+}
+bbnh-playlist-item[downloaded]:hover {
+    background-color: darkblue;
+}
 bbnh-playlist-item[playing] {
     background-color: blue;
 }
@@ -8,8 +14,7 @@ bbnh-playlist-item[downloading] {
     animation: downloading 1s infinite ease-out;
 }
 bbnh-playlist-item[downloaded] {
-    animation: downloaded 4s ease-out;
-    background-color: green;
+    animation: downloaded 1s ease-out;
 }
 
 @keyframes downloading {
