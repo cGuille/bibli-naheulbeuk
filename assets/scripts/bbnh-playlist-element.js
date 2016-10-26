@@ -24,7 +24,13 @@
             this.downloader = new AjaxDownloader();
             this.fileStorage = new Store(DATABASE, FILE_STORAGE_OBJECT_STORE);
 
-            this.fileStorage.open().then(this.addEventListener.bind(this, 'click', this.handleClick, false));
+            this.fileStorage.open().then(() => {
+                Promise.all(Array.prototype.map.call(this.children, item => {
+                    this.fileStorage.fetch(item.key).then(record => {
+                        item.downloaded = !!record;
+                    });
+                })).then(this.addEventListener.bind(this, 'click', this.handleClick, false));
+            });
         }
 
         handleClick(event) {
@@ -58,7 +64,6 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
             return this.downloader.downloadFileAsBlob(item.url).then(blob => {
                 return this.fileStorage.save({ key: item.key, value: blob }).then(() => {
                     item.downloading = false;
-                    item.src = window.URL.createObjectURL(blob);
                     item.downloaded = true;
                 });
             });
@@ -70,15 +75,16 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
                 this.playingItem.paused = false;
             }
 
-            if (!item.src) {
-                // TODO
+            if (!item.downloaded) {
                 return;
             }
 
-            this.audioPlayer.src = item.src;
-            this.audioPlayer.play();
-            this.playingItem = item;
-            this.playingItem.playing = true;
+            this.fetchItemSrc(item).then(() => {
+                this.audioPlayer.src = item.src;
+                this.audioPlayer.play();
+                this.playingItem = item;
+                this.playingItem.playing = true;
+            });
         }
 
         togglePause() {
@@ -94,6 +100,21 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
 
             this.playingItem.playing = !this.playingItem.playing;
             this.playingItem.paused = !this.playingItem.paused;
+        }
+
+        fetchItemSrc(item) {
+            return new Promise((resolve, reject) => {
+                if (item.src) {
+                    resolve();
+                    return;
+                }
+
+                this.fileStorage.fetch(item.key).then(record => {
+                    item.src = window.URL.createObjectURL(record.value);
+                    resolve();
+                    return;
+                }, reject);
+            });
         }
     }
 
