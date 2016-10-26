@@ -5,13 +5,11 @@
         throw new Error('this browser does not support the custom elements');
     }
 
-    const DATABASE = new Store.Db('bibli-naheulbeuk', 1);
-
-    const FILE_STORAGE_OBJECT_STORE = new Store.ObjectStore(
-        'file-storage',
-        { keyPath: 'key' },
-        [new Store.Index('key', { unique: true })]
-    );
+    const DATABASE = new Storage.Db('bibli-naheulbeuk', 1);
+    const DATA_STORES = [
+        new Storage.ObjectStore('file', { keyPath: 'key' }, [new Storage.Index('key', { unique: true })]),
+        new Storage.ObjectStore('time', { keyPath: 'key' }, [new Storage.Index('key', { unique: true })]),
+    ];
 
     class PlaylistElement extends HTMLElement {
         constructor() {
@@ -22,14 +20,37 @@
 
             this.audioPlayer = document.createElement('audio');
             this.downloader = new AjaxDownloader();
-            this.fileStorage = new Store(DATABASE, FILE_STORAGE_OBJECT_STORE);
+            this.storage = new Storage(DATABASE, DATA_STORES);
 
-            this.fileStorage.open().then(() => {
+            this.storage.open().then(() => {
                 Promise.all(Array.prototype.map.call(this.children, item => {
-                    this.fileStorage.fetch(item.key).then(record => {
+                    this.storage.store('file').fetch(item.key).then(record => {
                         item.downloaded = !!record;
                     });
                 })).then(this.addEventListener.bind(this, 'click', this.handleClick, false));
+
+                this.audioPlayer.addEventListener('timeupdate', event => {
+                    if (!this.playingItem) {
+                        return;
+                    }
+
+                    this.playingItem.currentTime = this.audioPlayer.currentTime;
+
+                    this.storage.store('time').save({
+                        key: this.playingItem.key,
+                        value: this.playingItem.currentTime,
+                    });
+                }, false);
+
+                Array.prototype.forEach.call(this.children, item => {
+                    this.storage.store('time').fetch(item.key).then(record => {
+                        if (!record) {
+                            return;
+                        }
+
+                        item.currentTime = record.value;
+                    });
+                });
             });
         }
 
@@ -62,7 +83,7 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
         download(item) {
             item.downloading = true;
             return this.downloader.downloadFileAsBlob(item.url).then(blob => {
-                return this.fileStorage.save({ key: item.key, value: blob }).then(() => {
+                return this.storage.store('file').save({ key: item.key, value: blob }).then(() => {
                     item.downloading = false;
                     item.downloaded = true;
                 });
@@ -81,6 +102,7 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
 
             this.fetchItemSrc(item).then(() => {
                 this.audioPlayer.src = item.src;
+                this.audioPlayer.currentTime = item.currentTime;
                 this.audioPlayer.play();
                 this.playingItem = item;
                 this.playingItem.playing = true;
@@ -109,7 +131,7 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
                     return;
                 }
 
-                this.fileStorage.fetch(item.key).then(record => {
+                this.storage.store('file').fetch(item.key).then(record => {
                     item.src = window.URL.createObjectURL(record.value);
                     resolve();
                     return;

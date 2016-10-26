@@ -10,7 +10,14 @@
             super();
 
             this.attachShadow({ mode: 'open' });
-            this.shadowRoot.innerHTML = `<label>${this.label}</label>`;
+
+            const label = document.createElement('label');
+            label.textContent = this.label;
+
+            this.currentTimeElt = document.createElement('span');
+
+            this.shadowRoot.appendChild(label);
+            this.shadowRoot.appendChild(this.currentTimeElt);
         }
 
         get key() {
@@ -23,6 +30,15 @@
 
         get url() {
             return trimmedAttributeValue.call(this, 'url');
+        }
+
+        get currentTime() {
+            return this.currentTimeValue || 0;
+        }
+
+        set currentTime(newValue) {
+            this.currentTimeValue = newValue;
+            this.currentTimeElt.textContent = ' – ' + Math.round(newValue) + 's';
         }
 
         get playing() {
