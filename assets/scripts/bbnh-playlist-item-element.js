@@ -32,6 +32,13 @@
             setBooleanAttributeValue.call(this, 'playing', isPlaying);
         }
 
+        get paused() {
+            return this.hasAttribute('paused');
+        }
+        set paused(isPaused) {
+            setBooleanAttributeValue.call(this, 'paused', isPaused);
+        }
+
         get downloading() {
             return this.hasAttribute('downloading');
         }

@@ -10,6 +10,9 @@ bbnh-playlist-item[downloaded]:hover {
 bbnh-playlist-item[playing] {
     background-color: blue;
 }
+bbnh-playlist-item[paused] {
+    background-color: lightblue;
+}
 bbnh-playlist-item[downloading] {
     animation: downloading 1s infinite ease-out;
 }

@@ -26,7 +26,11 @@
                 return;
             }
 
-            this.play(clickedItem);
+            if (this.playingItem === clickedItem) {
+                this.togglePause();
+            } else {
+                this.play(clickedItem);
+            }
         }
 
         confirmDownload(item) {
@@ -53,6 +57,7 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
         play(item) {
             if (this.playingItem) {
                 this.playingItem.playing = false;
+                this.playingItem.paused = false;
             }
 
             if (!item.src) {
@@ -64,6 +69,21 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
             this.audioPlayer.play();
             this.playingItem = item;
             this.playingItem.playing = true;
+        }
+
+        togglePause() {
+            if (!this.playingItem) {
+                return;
+            }
+
+            if (this.audioPlayer.paused) {
+                this.audioPlayer.play();
+            } else {
+                this.audioPlayer.pause();
+            }
+
+            this.playingItem.playing = !this.playingItem.playing;
+            this.playingItem.paused = !this.playingItem.paused;
         }
     }
 
