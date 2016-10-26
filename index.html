@@ -4,7 +4,7 @@
   <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-  <link rel="stylesheet" type="text/css" href="assets/stylesheets/stylesheet.css" media="screen">
+  <link rel="stylesheet" type="text/css" href="assets/stylesheets/theme.css" media="screen" />
 
   <title>La Bibliothèque de Naheulbeuk</title>
 </head>
@@ -16,18 +16,30 @@
   </header>
 
   <main>
-    <ul id="playlist">
-    </ul>
-    <audio id="player"></audio>
+    <bbnh-playlist>
+
+      <bbnh-playlist-item
+        key="season-1"
+        label="Saison 1 : Chez Zangdar"
+        url="assets/library/donjon-de-naheulbeuk01-nextgen.mp3">
+      </bbnh-playlist-item>
+
+      <bbnh-playlist-item
+        key="season-2"
+        label="Saison 2 : de Valtordu à Boulgourville"
+        url="assets/library/donjon-de-naheulbeuk01-nextgen.mp3">
+      </bbnh-playlist-item>
+
+      <bbnh-playlist-item
+        key="season-3"
+        label="Saison 3 : La Couette de l'Oubli"
+        url="assets/library/donjon-de-naheulbeuk01-nextgen.mp3">
+      </bbnh-playlist-item>
+
+    </bbnh-playlist>
   </main>
 
-  <template id="playlist-item">
-      <li class="playlist-item">
-        <label></label>
-      </li>
-  </template>
-
-  <script src="assets/scripts/store.js"></script>
-  <script src="assets/scripts/library.js"></script>
+  <script src="assets/scripts/bbnh-playlist-element.js"></script>
+  <script src="assets/scripts/bbnh-playlist-item-element.js"></script>
 </body>
 </html>

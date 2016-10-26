@@ -1,0 +1,57 @@
+/*
+  Color palette:
+  #455A64 Dark primary color
+  #607D8B Primary color
+  #CFD8DC Light primary color
+  #FFFFFF Text/icons
+  #FFEB3B Accent color
+  #212121 Primary text
+  #727272 Secondary text
+  #B6B6B6 Divider color
+*/
+
+html {
+  margin: 0;
+  padding: 0;
+  font-size: 100%;
+  background-color: #FFFFFF;
+}
+
+body {
+  margin: 0;
+  font-size: 1em;
+  font-family: Tahoma, Geneva, Kalimati, sans-serif;
+  color: #212121;
+  line-height: 1.6em;
+}
+
+#main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #455A64;
+  padding: 1.75em 5em;
+  color: #FFFFFF;
+}
+#main-header :first-child {
+  font-size: 2em;
+  font-weight: bold;
+}
+#main-header :last-child {
+  font-size: 1.3em;
+}
+
+h1 {
+  font-size: 2em;
+  line-height: 1em;
+}
+h2 {
+  font-size: 1.7em;
+}
+
+footer {
+  margin: 0 1em;
+  padding-top: 0.3em;
+  border-top: 0.2em solid rgb(41, 128, 185);
+  text-align: center;
+}
