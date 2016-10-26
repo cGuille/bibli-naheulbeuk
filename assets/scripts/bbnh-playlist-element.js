@@ -6,7 +6,12 @@
     }
 
     class PlaylistElement extends HTMLElement {
+        constructor() {
+            super();
 
+            this.style.display = 'flex';
+            this.style.flexDirection = 'column';
+        }
     }
 
     window.customElements.define('bbnh-playlist', PlaylistElement);
