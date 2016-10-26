@@ -1,0 +1,37 @@
+bbnh-playlist-item {
+    transition: background-color 150ms ease-in-out;
+}
+bbnh-playlist-item[playing] {
+    background-color: blue;
+}
+bbnh-playlist-item[downloading] {
+    animation: downloading 1s infinite ease-out;
+}
+bbnh-playlist-item[downloaded] {
+    animation: downloaded 4s ease-out;
+    background-color: green;
+}
+
+@keyframes downloading {
+    0% {
+        background-color: white;
+    }
+
+    50% {
+        background-color: green;
+    }
+
+    100% {
+        background-color: white;
+    }
+}
+
+@keyframes downloaded {
+    from {
+        background-color: green;
+    }
+
+    to {
+        background-color: white;
+    }
+}
