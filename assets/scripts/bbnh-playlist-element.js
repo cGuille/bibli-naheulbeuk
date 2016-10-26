@@ -5,6 +5,14 @@
         throw new Error('this browser does not support the custom elements');
     }
 
+    const DATABASE = new Store.Db('bibli-naheulbeuk', 1);
+
+    const FILE_STORAGE_OBJECT_STORE = new Store.ObjectStore(
+        'file-storage',
+        { keyPath: 'key' },
+        [new Store.Index('key', { unique: true })]
+    );
+
     class PlaylistElement extends HTMLElement {
         constructor() {
             super();
@@ -14,8 +22,9 @@
 
             this.audioPlayer = document.createElement('audio');
             this.downloader = new AjaxDownloader();
+            this.fileStorage = new Store(DATABASE, FILE_STORAGE_OBJECT_STORE);
 
-            this.addEventListener('click', this.handleClick, false);
+            this.fileStorage.open().then(this.addEventListener.bind(this, 'click', this.handleClick, false));
         }
 
         handleClick(event) {
@@ -47,10 +56,11 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
         download(item) {
             item.downloading = true;
             return this.downloader.downloadFileAsBlob(item.url).then(blob => {
-                // TODO: store blob
-                item.downloading = false;
-                item.src = window.URL.createObjectURL(blob);
-                item.downloaded = true;
+                return this.fileStorage.save({ key: item.key, value: blob }).then(() => {
+                    item.downloading = false;
+                    item.src = window.URL.createObjectURL(blob);
+                    item.downloaded = true;
+                });
             });
         }
 
