@@ -25,6 +25,17 @@
             return trimmedAttributeValue.call(this, 'url');
         }
 
+        get playing() {
+            return this.hasAttribute('playing');
+        }
+        set playing(isPlaying) {
+            if (isPlaying) {
+                this.setAttribute('playing', '');
+            } else {
+                this.removeAttribute('playing');
+            }
+        }
+
         get downloading() {
             return this.hasAttribute('downloading');
         }
