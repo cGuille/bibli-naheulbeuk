@@ -29,39 +29,35 @@
             return this.hasAttribute('playing');
         }
         set playing(isPlaying) {
-            if (isPlaying) {
-                this.setAttribute('playing', '');
-            } else {
-                this.removeAttribute('playing');
-            }
+            setBooleanAttributeValue.call(this, 'playing', isPlaying);
         }
 
         get downloading() {
             return this.hasAttribute('downloading');
         }
         set downloading(isDownloading) {
-            if (isDownloading) {
-                this.setAttribute('downloading', '');
-            } else {
-                this.removeAttribute('downloading');
-            }
+            setBooleanAttributeValue.call(this, 'downloading', isDownloading);
         }
 
         get downloaded() {
             return this.hasAttribute('downloaded');
         }
         set downloaded(isDownloaded) {
-            if (isDownloaded) {
-                this.setAttribute('downloaded', '');
-            } else {
-                this.removeAttribute('downloaded');
-            }
+            setBooleanAttributeValue.call(this, 'downloaded', isDownloaded);
         }
     }
 
-    function trimmedAttributeValue(attributeValue) {
-        const attr = this.getAttribute(attributeValue);
+    function trimmedAttributeValue(attributeName) {
+        const attr = this.getAttribute(attributeName);
         return attr ? attr.trim() : null;
+    }
+
+    function setBooleanAttributeValue(attributeName, isEnabled) {
+        if (isEnabled) {
+            this.setAttribute(attributeName, '');
+        } else {
+            this.removeAttribute(attributeName);
+        }
     }
 
     window.customElements.define('bbnh-playlist-item', PlaylistItemElement);
