@@ -101,6 +101,7 @@ Cette opération est déconseillée depuis les réseaux mobiles.`);
             }
 
             this.fetchItemSrc(item).then(() => {
+                this.audioPlayer.pause();
                 this.audioPlayer.src = item.src;
                 this.audioPlayer.currentTime = item.currentTime;
                 this.audioPlayer.play();
