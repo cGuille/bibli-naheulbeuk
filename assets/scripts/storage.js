@@ -1,149 +1,95 @@
-(function (globalScope) {
+(function (exports) {
     "use strict";
 
     const TRANSACTION_TYPE_READONLY = 'readonly';
     const TRANSACTION_TYPE_READWRITE = 'readwrite';
 
-    class DbDefinition {
-        constructor(name, version) {
-            this.name = name;
-            this.version = version;
-        }
-
-        getName() {
-            return this.name;
-        }
-
-        getVersion() {
-            return this.version;
-        }
-    }
-
-    class ObjectStoreDefinition {
-        constructor(name, options, indexes) {
-            this.name = name;
-            this.options = options || {};
-            this.indexes = indexes || [];
-        }
-
-        getName() {
-            return this.name;
-        }
-
-        getOptions() {
-            return this.options;
-        }
-
-        getIndexes() {
-            return this.indexes;
-        }
-    }
-
-    class IndexDefinition {
-        constructor(name, options) {
-            this.name = name;
-            this.options = options || {};
-        }
-
-        getName() {
-            return this.name;
-        }
-
-        getOptions() {
-            return this.options;
-        }
-    }
-
-    class Store {
+    class Collection {
         constructor(dbHandler, name) {
             this.dbHandler = dbHandler;
             this.name = name;
         }
 
-        save(record) {
-            const transaction = this.dbHandler.transaction([this.name], TRANSACTION_TYPE_READWRITE);
-            const objectStore = transaction.objectStore(this.name);
-            const addRequest = objectStore.put(record);
-
+        put(key, value) {
             return new Promise((resolve, reject) => {
-                addRequest.onerror = function (event) {
+                const transaction = this.dbHandler.transaction([this.name], TRANSACTION_TYPE_READWRITE);
+                const objectStore = transaction.objectStore(this.name);
+                const request = objectStore.put({ key: key, value: value });
+
+                request.onerror = event => {
                     reject(event.target.error);
-                }
-                addRequest.onsuccess = function (event) {
-                    resolve(event.target.result);
-                }
+                };
+                request.onsuccess = event => {
+                    resolve();
+                };
             });
         }
 
-        fetch(recordKey) {
-            const transaction = this.dbHandler.transaction([this.name], TRANSACTION_TYPE_READONLY);
-            const objectStore = transaction.objectStore(this.name);
-            const getRequest = objectStore.get(recordKey);
-
+        fetch(key) {
             return new Promise((resolve, reject) => {
-                getRequest.onerror = function (event) {
+                const transaction = this.dbHandler.transaction([this.name], TRANSACTION_TYPE_READONLY);
+                const objectStore = transaction.objectStore(this.name);
+                const request = objectStore.get(key);
+
+                request.onerror = event => {
                     reject(event.target.error);
-                }
-                getRequest.onsuccess = function (event) {
-                    resolve(event.target.result);
-                }
+                };
+                request.onsuccess = event => {
+                    resolve(event.target.result.value);
+                };
             });
+        }
+
+        has(key) {
+            return this.fetch(key).then(value => typeof(value) !== 'undefined');
         }
     }
 
     class Storage {
-        constructor(dbDefinition, objectStoreDefinitions) {
+        constructor(name, version, collectionNames) {
             this.dbHandler = null;
-            this.dbDefinition = dbDefinition;
-            this.objectStoreDefinitions = objectStoreDefinitions;
+            this.name = name;
+            this.version = version;
+            this.collectionNames = collectionNames;
 
-            this.stores = {};
+            this.collections = {};
         }
 
         open() {
             return new Promise((resolve, reject) => {
-                const openRequest = window.indexedDB.open(
-                    this.dbDefinition.getName(),
-                    this.dbDefinition.getVersion()
-                );
+                const request = window.indexedDB.open(this.name, this.version);
 
-                openRequest.onupgradeneeded = (event) => {
+                request.onupgradeneeded = event => {
                     const dbHandler = event.target.result;
 
-                    this.objectStoreDefinitions.forEach(objectStoreDefinition => {
-                        if (dbHandler.objectStoreNames.contains(objectStoreDefinition.getName())) {
+                    this.collectionNames.forEach(collectionName => {
+                        if (dbHandler.objectStoreNames.contains(collectionName)) {
                             return;
                         }
 
-                        const objectStore = dbHandler.createObjectStore(objectStoreDefinition.getName(), objectStoreDefinition.getOptions());
-                        objectStoreDefinition.getIndexes().forEach(index => {
-                            objectStore.createIndex(index.getName(), index.getName(), index.getOptions());
-                        });
+                        const objectStore = dbHandler.createObjectStore(collectionName, { keyPath: 'key' });
+                        objectStore.createIndex('key', 'key', { unique: true });
                     });
                 }
 
-                openRequest.onsuccess = (event) => {
+                request.onsuccess = event => {
                     this.dbHandler = event.target.result;
                     resolve();
-                }
-
-                openRequest.onerror = (event) => {
-                    reject(event.target.result);
-                }
+                };
+                request.onerror = event => {
+                    reject(event.target.error);
+                };
             });
         }
 
-        store(name) {
-            if (!this.stores[name]) {
-                this.stores[name] = new Store(this.dbHandler, name);
+        getCollection(name) {
+            if (!this.collections[name]) {
+                this.collections[name] = new Collection(this.dbHandler, name);
             }
 
-            return this.stores[name];
+            return this.collections[name];
         }
     }
 
-    globalScope.Storage = Storage;
-    globalScope.Storage.Db = DbDefinition;
-    globalScope.Storage.ObjectStore = ObjectStoreDefinition;
-    globalScope.Storage.Index = IndexDefinition;
+    exports.Storage = Storage;
 }(window));
