@@ -38,7 +38,7 @@
 
         set currentTime(newValue) {
             this.currentTimeValue = newValue;
-            this.currentTimeElt.textContent = ' – ' + Math.round(newValue) + 's';
+            this.currentTimeElt.textContent = ' – ' + humanReadableTime(newValue);
         }
 
         get playing() {
@@ -81,6 +81,29 @@
         } else {
             this.removeAttribute(attributeName);
         }
+    }
+
+    function humanReadableTime(timeInSeconds) {
+        let result = '';
+        let seconds = Math.round(timeInSeconds);
+
+        const hours = Math.floor(seconds / 3600);
+        seconds -= hours * 3600;
+
+        const minutes = Math.floor(seconds / 60);
+        seconds -= minutes * 60;
+
+        if (hours) {
+            result += hours + 'h ';
+        }
+
+        if (minutes) {
+            result += minutes + 'm ';
+        }
+
+        result += seconds + 's';
+
+        return result;
     }
 
     window.customElements.define('bbnh-playlist-item', PlaylistItemElement);
