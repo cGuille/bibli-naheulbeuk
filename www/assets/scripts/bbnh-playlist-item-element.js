@@ -11,13 +11,49 @@
 
             this.attachShadow({ mode: 'open' });
 
+            const main = document.createElement('main');
+
+            const style = document.createElement('style');
+            style.textContent = `
+main {
+    padding-left: 10px;
+}
+h1 {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1em;
+    font-weight: normal;
+}
+h1 label {
+    font-size: 1.2em;
+    min-width: 50%;
+}
+h1 span {
+    font-size: 0.6em;
+}
+            `;
+
+            const heading = document.createElement('h1');
+
             const label = document.createElement('label');
             label.textContent = this.label;
 
-            this.currentTimeElt = document.createElement('span');
+            const notDownloadedWarning = document.createElement('span');
+            notDownloadedWarning.textContent = "Cette saison n'est pas disponible à l'écoute car elle n'a pas encore été téléchargée !";
 
-            this.shadowRoot.appendChild(label);
-            this.shadowRoot.appendChild(this.currentTimeElt);
+            heading.appendChild(label);
+            heading.appendChild(notDownloadedWarning);
+
+            const controls = document.createElement('section');
+
+            this.currentTimeElt = document.createElement('span');
+            controls.appendChild(this.currentTimeElt);
+
+            main.appendChild(style);
+            main.appendChild(heading);
+            main.appendChild(controls);
+
+            this.shadowRoot.appendChild(main);
         }
 
         get key() {
