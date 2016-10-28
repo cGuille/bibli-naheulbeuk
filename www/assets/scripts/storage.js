@@ -35,7 +35,13 @@
                     reject(event.target.error);
                 };
                 request.onsuccess = event => {
-                    resolve(event.target.result.value);
+                    let value;
+
+                    if (event.target.result) {
+                        value = event.target.result.value;
+                    }
+
+                    resolve(value);
                 };
             });
         }
