@@ -36,6 +36,7 @@
                     }
 
                     this.playingItem.currentTime = this.audioPlayer.currentTime;
+                    this.playingItem.duration = this.audioPlayer.duration;
                     this.times.put(this.playingItem.key, this.playingItem.currentTime);
                 }, false);
 

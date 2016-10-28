@@ -38,7 +38,14 @@
 
         set currentTime(newValue) {
             this.currentTimeValue = newValue;
-            this.currentTimeElt.textContent = ' – ' + humanReadableTime(newValue);
+
+            let displayValue = 'Lecture : ' + humanReadableTime(newValue);
+
+            if (this.duration) {
+                displayValue += ' sur ' + humanReadableTime(this.duration);
+            }
+
+            this.currentTimeElt.textContent = displayValue;
         }
 
         get playing() {
