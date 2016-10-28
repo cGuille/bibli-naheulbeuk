@@ -28,30 +28,26 @@ body {
 #main-header {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   background-color: #455A64;
-  padding: 1.75em 5em;
+  padding: 1.3em 3em;
   color: #FFFFFF;
 }
 #main-header :first-child {
   font-size: 2em;
   font-weight: bold;
+  line-height: 1em;
+  margin-bottom: 10px;
 }
 #main-header :last-child {
-  font-size: 1.3em;
-}
-
-h1 {
-  font-size: 2em;
+  font-size: 0.8em;
   line-height: 1em;
 }
-h2 {
-  font-size: 1.7em;
-}
 
-footer {
-  margin: 0 1em;
-  padding-top: 0.3em;
-  border-top: 0.2em solid rgb(41, 128, 185);
-  text-align: center;
+bbnh-playlist-item {
+    transition: background-color 150ms ease-in-out;
+}
+bbnh-playlist-item:hover {
+    background-color: #CFD8DC;
 }
