@@ -1,8 +1,8 @@
 (function () {
     "use strict";
 
-    if (!'customElements' in window) {
-        throw new Error('this browser does not support the custom elements');
+    if (!window.customElements) {
+        throw new Error('this browser does not support custom elements');
     }
 
     const STORAGE_NAME = 'bibli-naheulbeuk';
