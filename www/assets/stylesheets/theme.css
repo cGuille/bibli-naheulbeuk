@@ -46,8 +46,14 @@ body {
 }
 
 bbnh-playlist-item {
-    transition: background-color 150ms ease-in-out;
+  display: block;
+  margin: 0;
+  padding: 10px;
+  transition: background-color 150ms ease-in-out;
 }
 bbnh-playlist-item:hover {
-    background-color: #CFD8DC;
+  background-color: #CFD8DC;
+}
+bbnh-playlist-item[selected] {
+  background-color: #607D8B;
 }
