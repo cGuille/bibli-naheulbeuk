@@ -15,21 +15,49 @@
             this.item = null;
 
             this.playlistElt.addEventListener('selected-item-change', event => {
+                if (!this.item) {
+                    this.main.appendChild(this.playPauseButton);
+                    this.main.appendChild(this.timeDisplay);
+                }
+
                 if (this.item && this.item.playing) {
                     this.item.pause();
                 }
 
                 this.item = event.target.selectedItem;
                 this.togglePlayPause();
+
+                this.item.addEventListener('timeupdate', event => {
+                    const time = humanReadableTime(this.item.currentTime) + ' sur ' + humanReadableTime(this.item.duration);
+                    this.timeDisplay.textContent = time;
+                }, false);
             }, false);
 
             this.attachShadow({ mode: 'open' });
-            const main = document.createElement('main');
+            this.main = document.createElement('main');
             const style = document.createElement('style');
             style.textContent = `
 main {
-    margin: 0;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: #607D8B;
+}
+
+main > button,
+main > span {
+    border: 1px solid #455A64;
+    padding: 0.2em 0.5em;
+    background: #CFD8DC;
+    color: #455A64;
+    height: 100%;
+}
+
+button {
+    border: none;
+    outline: none;
+    font-size: 1.5em;
 }
             `;
 
@@ -37,9 +65,10 @@ main {
             this.playPauseButton.textContent = PLAY_SYMBOL;
             this.playPauseButton.addEventListener('click', this.togglePlayPause.bind(this), false);
 
-            main.appendChild(style);
-            main.appendChild(this.playPauseButton);
-            this.shadowRoot.appendChild(main);
+            this.timeDisplay = document.createElement('span');
+
+            this.main.appendChild(style);
+            this.shadowRoot.appendChild(this.main);
         }
 
         togglePlayPause() {
@@ -92,6 +121,29 @@ main {
         }
 
         return playlist;
+    }
+
+    function humanReadableTime(timeInSeconds) {
+        let result = '';
+        let seconds = Math.round(timeInSeconds);
+
+        const hours = Math.floor(seconds / 3600);
+        seconds -= hours * 3600;
+
+        const minutes = Math.floor(seconds / 60);
+        seconds -= minutes * 60;
+
+        if (hours) {
+            result += hours + 'h ';
+        }
+
+        if (minutes) {
+            result += minutes + 'm ';
+        }
+
+        result += seconds + 's';
+
+        return result;
     }
 
     window.customElements.define('bbnh-player', PlayerElement);

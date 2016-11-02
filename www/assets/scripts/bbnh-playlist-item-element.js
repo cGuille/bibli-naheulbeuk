@@ -31,9 +31,8 @@
                 });
 
                 this.audioPlayer.addEventListener('timeupdate', event => {
-                    this.currentTime = this.audioPlayer.currentTime;
-                    this.duration = this.audioPlayer.duration;
-                    this.times.put(this.key, this.currentTime);
+                    this.times.put(this.key, this.audioPlayer.currentTime);
+                    this.dispatchEvent(new CustomEvent('timeupdate'));
                 }, false);
             });
 
@@ -142,10 +141,14 @@ h1 span {
         }
 
         get currentTime() {
-            return this.currentTimeValue || 0;
+            return this.audioPlayer.currentTime;
         }
         set currentTime(newValue) {
-            this.currentTimeValue = newValue;
+            this.audioPlayer.currentTime = newValue;
+        }
+
+        get duration() {
+            return this.audioPlayer.duration;
         }
 
         get selected() {
@@ -190,7 +193,6 @@ h1 span {
     function fetchAudioSource() {
         return this.files.fetch(this.key).then(blob => {
             this.audioPlayer.src = window.URL.createObjectURL(blob);
-            this.audioPlayer.currentTime = this.currentTime;
         });
     }
 
@@ -211,29 +213,6 @@ h1 span {
         } else {
             this.removeAttribute(attributeName);
         }
-    }
-
-    function humanReadableTime(timeInSeconds) {
-        let result = '';
-        let seconds = Math.round(timeInSeconds);
-
-        const hours = Math.floor(seconds / 3600);
-        seconds -= hours * 3600;
-
-        const minutes = Math.floor(seconds / 60);
-        seconds -= minutes * 60;
-
-        if (hours) {
-            result += hours + 'h ';
-        }
-
-        if (minutes) {
-            result += minutes + 'm ';
-        }
-
-        result += seconds + 's';
-
-        return result;
     }
 
     window.customElements.define('bbnh-playlist-item', PlaylistItemElement);
