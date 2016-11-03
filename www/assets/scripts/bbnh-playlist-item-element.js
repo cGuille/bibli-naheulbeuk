@@ -16,7 +16,22 @@
             super();
 
             this.audioPlayer = document.createElement('audio');
-            this.downloader = new AjaxDownloader();
+            this.ajaxDownload = new AjaxDownload.create(this.url);
+            this.ajaxDownload.addEventListener('progress', () => {
+                const progress = this.ajaxDownload.progress;
+                if (!progress.computable) {
+                    return;
+                }
+
+                if (!this.downloadProgressElt) {
+                    this.downloadProgressElt = document.createElement('progress');
+                    this.notDownloadedWarning.parentElement.replaceChild(this.downloadProgressElt, this.notDownloadedWarning);
+                }
+
+                this.downloadProgressElt.setAttribute('value', progress.loaded);
+                this.downloadProgressElt.setAttribute('max', progress.total);
+
+            }, false);
 
             const storage = new Storage(STORAGE_NAME, STORAGE_VERSION, STORAGE_COLLECTIONS);
             storage.open().then(() => {
@@ -116,7 +131,7 @@ h1 span {
                 }
 
                 this.downloading = true;
-                return this.downloader.downloadFileAsBlob(this.url).then(blob => {
+                return this.ajaxDownload.fetch().then(blob => {
                     return this.files.put(this.key, blob).then(() => {
                         this.downloading = false;
                         this.downloaded = true;
@@ -184,7 +199,12 @@ h1 span {
         }
         set downloaded(isDownloaded) {
             if (isDownloaded) {
-                this.notDownloadedWarning.parentElement.removeChild(this.notDownloadedWarning);
+                if (this.notDownloadedWarning.parentElement) {
+                    this.notDownloadedWarning.parentElement.removeChild(this.notDownloadedWarning);
+                }
+                if (this.downloadProgressElt) {
+                    this.downloadProgressElt.parentElement.removeChild(this.downloadProgressElt);
+                }
             }
             setBooleanAttributeValue.call(this, 'downloaded', isDownloaded);
         }
