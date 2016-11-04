@@ -121,9 +121,11 @@ h1 span {
 
 
         download() {
-            const confirmMessage =`Souhaitez-vous lancer le téléchargement du fichier « ${this.label} » ?
+            const confirmMessage =`Souhaitez-vous lancer le téléchargement de ce fichier ?
 
-    Cette opération est déconseillée depuis les réseaux mobiles.`;
+« ${this.label} »
+
+Cette opération est déconseillée depuis les réseaux mobiles.`;
 
             return confirmPopin(confirmMessage).then(confirmation => {
                 if (!confirmation) {
