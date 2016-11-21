@@ -36,6 +36,8 @@
             }
 
             if (!this.audioPlayer.src) {
+                // TODO: on mobile, this does not work since we can only call
+                // audio.play() on a user event:
                 fetchAudioSource.call(this).then(this.play.bind(this));
                 return;
             }
