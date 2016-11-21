@@ -9,24 +9,17 @@
         constructor() {
             super();
 
-            this.selectedItem = null;
+            this.playingItem = null;
 
-            this.addEventListener('click', event => {
-                if (this.selectedItem) {
-                    this.selectedItem.selected = false;
+            this.addEventListener('play', event => {
+                const playingItem = event.target;
+
+                if (this.playingItem && this.playingItem !== playingItem) {
+                    this.playingItem.pause();
                 }
 
-                this.selectedItem = event.target;
-
-                this.selectedItem.selected = true;
-                this.dispatchEvent(new SelectedItemChangeEvent());
+                this.playingItem = playingItem;
             }, true);
-        }
-    }
-
-    class SelectedItemChangeEvent extends CustomEvent {
-        constructor() {
-            super('selected-item-change');
         }
     }
 

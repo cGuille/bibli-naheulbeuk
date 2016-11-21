@@ -54,7 +54,7 @@ bbnh-playlist-item {
 bbnh-playlist-item:hover {
   background-color: #CFD8DC;
 }
-bbnh-playlist-item[selected] {
+bbnh-playlist-item[playing] {
   background-color: #607D8B;
   color: #CFD8DC;
   border-top: 1px solid #455A64;
