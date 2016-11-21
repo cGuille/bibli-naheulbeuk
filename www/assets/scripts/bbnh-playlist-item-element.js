@@ -159,7 +159,7 @@
             ]).then(() => {
                 this.audioPlayer.addEventListener('timeupdate', event => {
                     this.times.put(this.key, this.audioPlayer.currentTime);
-                    this.currentTimeElt.textContent = humanReadableTime(this.audioPlayer.currentTime);
+                    this.currentTimeElt.textContent = humanReadableTime(this.audioPlayer.currentTime) + ' / ' + humanReadableTime(this.audioPlayer.duration);;
                 }, false);
             });
         });
