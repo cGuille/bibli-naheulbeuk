@@ -18,4 +18,4 @@ WEB_PATH="${ROOT_PATH}/www"
 
 confirm "You are about to deploy the code as it is in the '${WEB_PATH}' directory. Confirm? (y/N)" || exit
 
-rsync --safe-links --times --human-readable --progress -r "${WEB_PATH}/" naheulbeuk@cguille.net:www/
+rsync --safe-links --delete --times --human-readable --progress -r "${WEB_PATH}/" naheulbeuk@cguille.net:www/
