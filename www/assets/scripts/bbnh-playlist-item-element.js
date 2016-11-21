@@ -235,7 +235,8 @@ button {
     padding: 0.2em 0.5em;
 }
 .timedisplay {
-    font-size: 1.9em;
+    font-size: 1.6em;
+    white-space: nowrap;
 }
 `;
     }
