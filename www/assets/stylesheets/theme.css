@@ -1,14 +1,13 @@
-/*
-  Color palette:
-  #455A64 Dark primary color
-  #607D8B Primary color
-  #CFD8DC Light primary color
-  #FFFFFF Text/icons
-  #FFEB3B Accent color
-  #212121 Primary text
-  #727272 Secondary text
-  #B6B6B6 Divider color
-*/
+:root {
+  --primary-color: #607D8B;
+  --dark-primary-color: #455A64;
+  --light-primary-color: #CFD8DC;
+  --text-icons: #FFFFFF;
+  --accent-color: #FFEB3B;
+  --primary-text: #212121;
+  --secondary-text: #727272;
+  --divider-color: #B6B6B6;
+}
 
 html {
   margin: 0;
@@ -21,7 +20,7 @@ body {
   margin: 0;
   font-size: 2em;
   font-family: Tahoma, Geneva, Kalimati, sans-serif;
-  color: #212121;
+  color: var(--primary-text);
   line-height: 1.6em;
 }
 
@@ -30,9 +29,9 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
-  background-color: #455A64;
+  background-color: var(--dark-primary-color);
   padding: 1.3em 3em;
-  color: #FFFFFF;
+  color: var(--text-icons);
 }
 #main-header :first-child {
   font-size: 2em;
@@ -52,11 +51,11 @@ bbnh-playlist-item {
   transition: background-color 150ms ease-in-out;
 }
 bbnh-playlist-item:hover {
-  background-color: #CFD8DC;
+  background-color: var(--light-primary-color);
 }
 bbnh-playlist-item[playing] {
-  background-color: #607D8B;
-  color: #CFD8DC;
-  border-top: 1px solid #455A64;
-  border-bottom: 1px solid #455A64;
+  background-color: var(--primary-color);
+  color: var(--light-primary-color);
+  border-top: 1px solid var(--dark-primary-color);
+  border-bottom: 1px solid var(--dark-primary-color);
 }
