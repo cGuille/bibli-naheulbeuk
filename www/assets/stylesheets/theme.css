@@ -45,17 +45,7 @@ body {
 }
 
 bbnh-playlist-item {
-  display: block;
-  margin: 0;
-  padding: 10px;
-  transition: background-color 150ms ease-in-out;
-}
-bbnh-playlist-item:hover {
-  background-color: var(--light-primary-color);
-}
-bbnh-playlist-item[playing] {
-  background-color: var(--primary-color);
-  color: var(--light-primary-color);
-  border-top: 1px solid var(--dark-primary-color);
-  border-bottom: 1px solid var(--dark-primary-color);
+  --main-color: var(--primary-color);
+  --secondary-color: var(--dark-primary-color);
+  --text-color: var(--light-primary-color);
 }

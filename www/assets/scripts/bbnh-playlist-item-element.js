@@ -226,9 +226,9 @@ section :first-child {
     margin-right: 1em;
 }
 button {
-    background: #CFD8DC;
-    border: 1px solid #455A64;
-    color: #455A64;
+    background: var(--text-color);
+    border: 1px solid var(--secondary-color, black);
+    color: var(--main-color);
     font-size: 1.5em;
     height: 100%;
     outline: none;
@@ -296,6 +296,23 @@ Cette opération est déconseillée depuis les réseaux mobiles.`;
 
         return result;
     }
+
+    const elementStyle = document.createElement('style');
+    elementStyle.textContent = `
+bbnh-playlist-item {
+  display: block;
+  margin: 0;
+  padding: 10px;
+  transition: background-color 150ms ease-in-out;
+}
+bbnh-playlist-item[playing] {
+  background-color: var(--main-color);
+  color: var(--text-color);
+  border-top: 1px solid var(--secondary-color);
+  border-bottom: 1px solid var(--secondary-color);
+}
+`;
+    document.body.appendChild(elementStyle);
 
     window.customElements.define('bbnh-playlist-item', PlaylistItemElement);
 }());
