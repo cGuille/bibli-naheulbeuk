@@ -320,11 +320,13 @@ bbnh-playlist-item {
   padding: 10px;
   transition: background-color 150ms ease-in-out;
 }
+bbnh-playlist-item:not(:last-of-type) {
+  border-bottom: 1px solid var(--secondary-color);
+}
+
 bbnh-playlist-item[playing] {
   background-color: var(--main-color);
   color: var(--text-color);
-  border-top: 1px solid var(--secondary-color);
-  border-bottom: 1px solid var(--secondary-color);
 }
 `;
     document.body.appendChild(elementStyle);
