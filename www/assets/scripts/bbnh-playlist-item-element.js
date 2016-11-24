@@ -125,6 +125,7 @@
                     this.downloading = true;
                     this.controls.innerHTML = '';
                     this.downloadProgressElt = document.createElement('progress');
+                    this.downloadProgressElt.classList.add('dl-progressbar')
                     this.controls.appendChild(this.downloadProgressElt);
 
                     return this.ajaxDownload.fetch().then(blob => {
@@ -225,6 +226,20 @@ section {
 section :first-child {
     margin-right: 1em;
 }
+.dl-progressbar {
+    border: 1px solid var(--secondary-color, black);
+    width: 100%;
+}
+.dl-progressbar::-webkit-progress-bar {
+    background: transparent;
+}
+.dl-progressbar::-webkit-progress-value {
+    background: var(--secondary-color, black);
+}
+.dl-progressbar::-moz-progress-bar {
+    background: var(--secondary-color, black);
+}
+
 button {
     background: var(--text-color);
     border: 1px solid var(--secondary-color, black);
