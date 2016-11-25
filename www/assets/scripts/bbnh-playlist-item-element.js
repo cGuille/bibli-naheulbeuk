@@ -14,46 +14,50 @@
     const STORAGE_COLLECTION_TIMES = 'times';
     const STORAGE_COLLECTIONS = [STORAGE_COLLECTION_FILES, STORAGE_COLLECTION_TIMES];
 
+    const STATE_CONSTRUCTED = 'constructed';
+    const STATE_INITIALIZED = 'initialized';
+    const STATE_PENDING_DOWNLOAD = 'pending-download';
+    const STATE_DOWNLOADING = 'downloading';
+    const STATE_DOWNLOADED = 'downloaded';
+    const STATE_LOADING = 'loading';
+    const STATE_PLAYING = 'playing';
+    const STATE_PAUSED = 'paused';
+    const STATES = [STATE_CONSTRUCTED, STATE_INITIALIZED, STATE_PENDING_DOWNLOAD, STATE_DOWNLOADING, STATE_DOWNLOADED, STATE_LOADING, STATE_PLAYING, STATE_PAUSED];
+
     class PlaylistItemElement extends HTMLElement {
         constructor() {
             super();
+            setState.call(this, 'constructed');
 
             this.audioPlayer = document.createElement('audio');
 
             initContent.call(this);
+
             initStorage.call(this).then(() => {
                 if (!this.downloaded) {
                     initDownload.call(this);
-                } else {
-                    setPlayableControls.call(this);
                 }
             });
         }
 
         play() {
-            if (!this.downloaded) {
-                throw new Error('trying to play a non downloaded playlist item');
-            }
-
             if (!this.audioPlayer.src) {
-                // TODO: on mobile, this does not work since we can only call
-                // audio.play() on a user event:
-                fetchAudioSource.call(this).then(this.play.bind(this));
-                return;
+                throw new Error('trying to play an item without source');
             }
 
-            this.paused = false;
+            setState.call(this, STATE_LOADING);
 
             return this.audioPlayer.play().then(() => {
-                this.playing = true;
+                setState.call(this, STATE_PLAYING);
+                this.playPauseButton.textContent = PAUSE_SYMBOL;
                 this.dispatchEvent(new CustomEvent('play'));
             });
         }
 
         pause() {
-            this.playing = false;
             this.audioPlayer.pause();
-            this.paused = true;
+            setState.call(this, STATE_PAUSED);
+            this.playPauseButton.textContent = PLAY_SYMBOL;
             this.dispatchEvent(new CustomEvent('pause'));
         }
 
@@ -69,101 +73,25 @@
             return trimmedAttributeValue.call(this, 'url');
         }
 
-        get playing() {
-            return this.hasAttribute('playing');
-        }
-        set playing(isPlaying) {
-            this.playPauseButton.textContent = isPlaying ? PAUSE_SYMBOL : PLAY_SYMBOL;
-            setBooleanAttributeValue.call(this, 'playing', isPlaying);
-        }
-
-        get paused() {
-            return this.hasAttribute('paused');
-        }
-        set paused(isPaused) {
-            setBooleanAttributeValue.call(this, 'paused', isPaused);
+        get pendingDownload() {
+            return this.hasAttribute(STATE_PENDING_DOWNLOAD);
         }
 
         get downloading() {
-            return this.hasAttribute('downloading');
-        }
-        set downloading(isDownloading) {
-            setBooleanAttributeValue.call(this, 'downloading', isDownloading);
+            return this.hasAttribute(STATE_DOWNLOADING);
         }
 
         get downloaded() {
-            return this.hasAttribute('downloaded');
+            return this.hasAttribute(STATE_DOWNLOADED);
         }
-        set downloaded(isDownloaded) {
-            setBooleanAttributeValue.call(this, 'downloaded', isDownloaded);
+
+        get playing() {
+            return this.hasAttribute(STATE_PLAYING);
         }
-    }
 
-    function initDownload() {
-        this.ajaxDownload = new AjaxDownload.create(this.url);
-
-        this.ajaxDownload.addEventListener('progress', () => {
-            const progress = this.ajaxDownload.progress;
-            if (!progress.computable) {
-                return;
-            }
-
-            this.downloadProgressElt.setAttribute('value', progress.loaded);
-            this.downloadProgressElt.setAttribute('max', progress.total);
-
-        }, false);
-
-        this.addEventListener('click', event => {
-            if (!this.downloading && !this.downloaded) {
-                const confirmMessage = getDownloadConfirmMessage.call(this);
-
-                return confirmPopin(confirmMessage).then(confirmation => {
-                    if (!confirmation || this.downloading || this.downloaded) {
-                        return false;
-                    }
-
-                    this.downloading = true;
-                    this.controls.innerHTML = '';
-                    this.downloadProgressElt = document.createElement('progress');
-                    this.downloadProgressElt.classList.add('dl-progressbar')
-                    this.controls.appendChild(this.downloadProgressElt);
-
-                    return this.ajaxDownload.fetch().then(blob => {
-                        return this.files.put(this.key, blob).then(() => {
-                            this.downloading = false;
-                            this.downloaded = true;
-
-                            setPlayableControls.call(this);
-
-                            return true;
-                        });
-                    });
-                });
-            }
-        }, false);
-    }
-
-    function initStorage() {
-        const storage = new Storage(STORAGE_NAME, STORAGE_VERSION, STORAGE_COLLECTIONS);
-
-        return storage.open().then(() => {
-            this.files = storage.getCollection(STORAGE_COLLECTION_FILES);
-            this.times = storage.getCollection(STORAGE_COLLECTION_TIMES);
-
-            return Promise.all([
-                this.files.has(this.key).then(hasFile => this.downloaded = hasFile),
-                this.times.fetch(this.key).then(time => {
-                    if (time) {
-                        this.audioPlayer.currentTime = time;
-                    }
-                })
-            ]).then(() => {
-                this.audioPlayer.addEventListener('timeupdate', event => {
-                    this.times.put(this.key, this.audioPlayer.currentTime);
-                    this.currentTimeElt.textContent = humanReadableTime(this.audioPlayer.currentTime) + ' / ' + humanReadableTime(this.audioPlayer.duration);;
-                }, false);
-            });
-        });
+        get paused() {
+            return this.hasAttribute(STATE_PAUSED);
+        }
     }
 
     function initContent() {
@@ -180,15 +108,9 @@
         main.appendChild(heading);
 
         this.controls = document.createElement('section');
-        // this.controls.textContent = "Cette saison n'est pas disponible à l'écoute car elle n'a pas encore été téléchargée ! Cliquez pour lancer le téléchargement.";
 
-        main.appendChild(this.controls);
-
-        this.shadowRoot.appendChild(main);
-    }
-
-    function setPlayableControls() {
-        this.controls.innerHTML = '';
+        this.downloadProgressElt = document.createElement('progress');
+        this.downloadProgressElt.classList.add('dl-progressbar');
 
         this.playPauseButton = document.createElement('button');
         this.playPauseButton.textContent = PLAY_SYMBOL;
@@ -197,6 +119,85 @@
         this.currentTimeElt = document.createElement('span');
         this.currentTimeElt.classList.add('timedisplay');
 
+        main.appendChild(this.controls);
+
+        this.shadowRoot.appendChild(main);
+    }
+
+    function initStorage() {
+        const storage = new Storage(STORAGE_NAME, STORAGE_VERSION, STORAGE_COLLECTIONS);
+
+        return storage.open().then(() => {
+            this.files = storage.getCollection(STORAGE_COLLECTION_FILES);
+            this.times = storage.getCollection(STORAGE_COLLECTION_TIMES);
+            setState.call(this, STATE_INITIALIZED);
+
+            return this.files.fetch(this.key).then(blob => {
+                if (!blob) {
+                    setState.call(this, STATE_PENDING_DOWNLOAD);
+                    return;
+                }
+
+                setUpAudioPlayer.call(this, blob);
+            });
+        });
+    }
+
+    function initDownload() {
+        this.ajaxDownload = new AjaxDownload.create(this.url);
+
+        this.ajaxDownload.addEventListener('progress', () => {
+            const progress = this.ajaxDownload.progress;
+            if (!progress.computable) {
+                return;
+            }
+
+            this.downloadProgressElt.setAttribute('value', progress.loaded);
+            this.downloadProgressElt.setAttribute('max', progress.total);
+        }, false);
+
+        this.addEventListener('click', event => {
+            if (!this.pendingDownload) {
+                return;
+            }
+
+            const confirmMessage = getDownloadConfirmMessage.call(this);
+            confirmPopin(confirmMessage).then(confirmation => {
+                if (!confirmation || !this.pendingDownload) {
+                    return;
+                }
+
+                setState.call(this, STATE_DOWNLOADING);
+
+                this.controls.innerHTML = '';
+                this.controls.appendChild(this.downloadProgressElt);
+
+                this.ajaxDownload.fetch().then(blob => {
+                    this.files.put(this.key, blob).then(() => setUpAudioPlayer.call(this, blob));
+                });
+            });
+        }, false);
+    }
+
+    function setUpAudioPlayer(blob) {
+        this.audioPlayer.src = window.URL.createObjectURL(blob);
+
+        this.audioPlayer.addEventListener('timeupdate', event => {
+            this.times.put(this.key, this.audioPlayer.currentTime);
+            this.currentTimeElt.textContent = humanReadableTime(this.audioPlayer.currentTime) + ' / ' + humanReadableTime(this.audioPlayer.duration);;
+        }, false);
+
+        return this.times.fetch(this.key).then(time => {
+            if (time) {
+                this.audioPlayer.currentTime = time;
+            }
+            setPlayableControls.call(this);
+            setState.call(this, STATE_DOWNLOADED);
+        });
+    }
+
+    function setPlayableControls() {
+        this.controls.innerHTML = '';
         this.controls.appendChild(this.playPauseButton);
         this.controls.appendChild(this.currentTimeElt);
     }
@@ -264,12 +265,6 @@ button {
 Cette opération est déconseillée depuis les réseaux mobiles.`;
     }
 
-    function fetchAudioSource() {
-        return this.files.fetch(this.key).then(blob => {
-            this.audioPlayer.src = window.URL.createObjectURL(blob);
-        });
-    }
-
     function confirmPopin(message) {
         return new Promise(resolve => {
             setTimeout(() => resolve(window.confirm(message)), 0);
@@ -287,6 +282,10 @@ Cette opération est déconseillée depuis les réseaux mobiles.`;
         } else {
             this.removeAttribute(attributeName);
         }
+    }
+
+    function setState(newState) {
+        STATES.forEach(state => setBooleanAttributeValue.call(this, state, state === newState));
     }
 
     function humanReadableTime(timeInSeconds) {
