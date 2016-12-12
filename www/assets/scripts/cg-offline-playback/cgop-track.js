@@ -8,7 +8,7 @@
     const PLAY_SYMBOL = '▶';
     const PAUSE_SYMBOL = '⏸';
 
-    const STORAGE_NAME = 'bibli-naheulbeuk';
+    const STORAGE_NAME = 'cgop-tracks';
     const STORAGE_VERSION = 1;
     const STORAGE_COLLECTION_FILES = 'files';
     const STORAGE_COLLECTION_TIMES = 'times';
@@ -24,7 +24,7 @@
     const STATE_PAUSED = 'paused';
     const STATES = [STATE_CONSTRUCTED, STATE_INITIALIZED, STATE_PENDING_DOWNLOAD, STATE_DOWNLOADING, STATE_DOWNLOADED, STATE_LOADING, STATE_PLAYING, STATE_PAUSED];
 
-    class PlaylistItemElement extends HTMLElement {
+    class TrackElement extends HTMLElement {
         constructor() {
             super();
             setState.call(this, 'constructed');
@@ -42,7 +42,7 @@
 
         play() {
             if (!this.audioPlayer.src) {
-                throw new Error('trying to play an item without source');
+                throw new Error('trying to play a track which does not have any "src" attribute');
             }
 
             setState.call(this, STATE_LOADING);
@@ -313,22 +313,22 @@ Cette opération est déconseillée depuis les réseaux mobiles.`;
 
     const elementStyle = document.createElement('style');
     elementStyle.textContent = `
-bbnh-playlist-item {
+cgop-track {
   display: block;
   margin: 0;
   padding: 10px;
   transition: background-color 150ms ease-in-out;
 }
-bbnh-playlist-item:not(:last-of-type) {
+cgop-track:not(:last-of-type) {
   border-bottom: 1px solid var(--secondary-color);
 }
 
-bbnh-playlist-item[playing] {
+cgop-track[playing] {
   background-color: var(--main-color);
   color: var(--text-color);
 }
 `;
     document.body.appendChild(elementStyle);
 
-    window.customElements.define('bbnh-playlist-item', PlaylistItemElement);
+    window.customElements.define('cgop-track', TrackElement);
 }());

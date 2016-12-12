@@ -9,19 +9,19 @@
         constructor() {
             super();
 
-            this.playingItem = null;
+            this.currentTrack = null;
 
             this.addEventListener('play', event => {
-                const playingItem = event.target;
+                const currentTrack = event.target;
 
-                if (this.playingItem && this.playingItem !== playingItem) {
-                    this.playingItem.pause();
+                if (this.currentTrack && this.currentTrack !== currentTrack) {
+                    this.currentTrack.pause();
                 }
 
-                this.playingItem = playingItem;
+                this.currentTrack = currentTrack;
             }, true);
         }
     }
 
-    window.customElements.define('bbnh-playlist', PlaylistElement);
+    window.customElements.define('cgop-playlist', PlaylistElement);
 }());
