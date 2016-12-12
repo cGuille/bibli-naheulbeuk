@@ -144,7 +144,7 @@
     }
 
     function initDownload() {
-        this.ajaxDownload = new AjaxDownload.create(this.url);
+        this.ajaxDownload = new AjaxDownload(this.url);
 
         this.ajaxDownload.addEventListener('progress', () => {
             const progress = this.ajaxDownload.progress;

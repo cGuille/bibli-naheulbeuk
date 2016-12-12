@@ -1,10 +1,6 @@
 (function (exports) {
     "use strict";
 
-    function createDownload(url) {
-        return new AjaxDownload(url);
-    }
-
     class DownloadProgress extends CustomEvent {
         constructor() {
             super('progress');
@@ -68,5 +64,5 @@
         reject(new Error('download canceled'));
     }
 
-    exports.AjaxDownload = { create: createDownload };
+    exports.AjaxDownload = AjaxDownload;
 }(window));
