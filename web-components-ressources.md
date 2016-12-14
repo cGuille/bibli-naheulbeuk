@@ -1,2 +1,0 @@
-- https://developers.google.com/web/fundamentals/getting-started/primers/customelements
-- https://developers.google.com/web/fundamentals/getting-started/primers/shadowdom
