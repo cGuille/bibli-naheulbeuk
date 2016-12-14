@@ -1,0 +1,25 @@
+{
+  "name": "bibli-naheulbeuk",
+  "version": "1.0.0",
+  "description": "A library application to listen to the Naheulbeuk series offline.",
+  "scripts": {
+    "postinstall": "cmd/concat"
+  },
+  "dependencies": {
+    "cg-offline-playback": "github:cguille/cg-offline-playback"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cGuille/bibli-naheulbeuk.git"
+  },
+  "keywords": [
+    "naheulbeuk",
+    "offline",
+    "audio",
+    "webcomponents"
+  ],
+  "author": "Guillaume Charmetant <cguille.dev@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/cGuille/bibli-naheulbeuk/issues"
+  }
+}

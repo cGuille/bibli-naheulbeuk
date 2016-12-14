@@ -1,1 +1,7 @@
+/node_modules
+
+# Heavy MP3 files:
 /www/assets/library/*
+
+# Generated JS files:
+/www/assets/scripts/bibli-naheulbeuk.js
