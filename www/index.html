@@ -17,7 +17,7 @@
   </header>
 
   <main>
-    <cgop-playlist>
+    <cgop-playlist confirm-download-tpl="#confirm-download">
       <cgop-track
         key="season-1"
         label="Saison 1 : Chez Zangdar"
@@ -37,6 +37,19 @@
       </cgop-track>
     </cgop-playlist>
   </main>
+
+  <template id="confirm-download">
+    <div>
+      <p>
+        Souhaitez-vous lancer le téléchargement de « <span class="track-label"></span> » maintenant ?<br />
+        Cette opération est déconseillée depuis les réseaux mobiles.
+      </p>
+      <div class="buttons">
+        <button class="confirm">Télécharger</button>
+        <button class="cancel">Plus tard</button>
+      </div>
+    </div>
+  </template>
 
   <script src="assets/scripts/bibli-naheulbeuk.js"></script>
 </body>

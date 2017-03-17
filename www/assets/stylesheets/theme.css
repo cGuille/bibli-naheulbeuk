@@ -49,3 +49,32 @@ cgop-track {
   --secondary-color: var(--dark-primary-color);
   --text-color: var(--light-primary-color);
 }
+
+.cgop-download-confirm-popin {
+  background-color: var(--light-primary-color);
+  border-radius: 2%;
+  color: var(--dark-primary-color);
+  padding: 1em;
+  width: 70vw;
+}
+
+.cgop-download-confirm-popin p {
+  margin-top: 0;
+}
+
+.cgop-download-confirm-popin .track-label {
+  font-weight: bold;
+}
+
+.cgop-download-confirm-popin .buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.cgop-download-confirm-popin button {
+  background-color: var(--primary-color);
+  color: var(--text-icons);
+  font-size: 1.2em;
+  padding: .4em;
+  font-weight: bold;
+}
