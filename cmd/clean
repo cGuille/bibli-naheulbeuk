@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-ROOT_PATH="$(realpath $(dirname ${BASH_SOURCE[0]})/..)"
-WEB_PATH="${ROOT_PATH}/www"
-
-DEST_PATH="${WEB_PATH}/assets/scripts/bibli-naheulbeuk.js"
-
-rm -f "${DEST_PATH}"

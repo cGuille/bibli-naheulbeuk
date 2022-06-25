@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -eu
+
+ROOT_PATH="$(realpath "$(dirname "${BASH_SOURCE[0]}")"/..)"
+WEB_PATH="${ROOT_PATH}/docs"
+
+AUDIO_PATH="${WEB_PATH}/assets/audio"
+DEST_PATH="${WEB_PATH}/assets/scripts/bibli-naheulbeuk.js"
+
+rm -f "${DEST_PATH}"
+
+function append() {
+  echo -n "Writing '${1}' to '${DEST_PATH}'…"
+  cat "${1}" >> "${DEST_PATH}"
+  echo " done."
+}
+
+echo -n "Building track list from files at ${AUDIO_PATH}…"
+
+tmpfile="$(mktemp --tmpdir tracks.js.XXXXXXXXXXX)"
+
+echo 'window.TRACKS = [' > "${tmpfile}"
+for mp3path in "${AUDIO_PATH}"/*
+do
+  mp3name="$(basename "${mp3path}")"
+  mp3label="Épisode $(basename -s .mp3 "$(echo "$mp3name" | grep -oE '([0-9-]+)\.mp3$')")"
+  echo "{file: '$mp3name', label: '$mp3label'}," >> "${tmpfile}"
+done
+echo '];' >> "${tmpfile}"
+
+echo " done."
+
+append "${tmpfile}"
+rm "${tmpfile}"
+
+append "${ROOT_PATH}/src/create-tracks.js"
+append "${ROOT_PATH}/node_modules/dom-event-emitter/src/event-emitter.js"
+append "${ROOT_PATH}/node_modules/ajax-download/src/ajax-download.js"
+append "${ROOT_PATH}/node_modules/cg-offline-playback/src/storage.js"
+append "${ROOT_PATH}/node_modules/cg-offline-playback/src/cgop-playlist.js"
+append "${ROOT_PATH}/node_modules/cg-offline-playback/src/cgop-track.js"
+
+echo "${DEST_PATH} generated."

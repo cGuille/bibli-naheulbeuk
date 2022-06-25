@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -eu
+
+ROOT_PATH="$(realpath "$(dirname "${BASH_SOURCE[0]}")"/..)"
+WEB_PATH="${ROOT_PATH}/docs"
+
+php -S localhost:3000 -t "$WEB_PATH"

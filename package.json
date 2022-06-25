@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A library application to listen to the Naheulbeuk series offline.",
   "scripts": {
-    "postinstall": "cmd/concat"
+    "postinstall": "cmd/build"
   },
   "dependencies": {
     "cg-offline-playback": "github:cguille/cg-offline-playback"
